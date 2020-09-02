@@ -1,4 +1,4 @@
-import { Contract } from 'ethers'
+import { Contract, Wallet, providers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import {
   BigNumber,
@@ -9,6 +9,25 @@ import {
   toUtf8Bytes,
   solidityPack
 } from 'ethers/utils'
+import { SimpleContractJSON } from 'ethereum-waffle/dist/esm/ContractJSON'
+import PrivateKeyProvider from './private-provider';
+import Web3 from 'web3';
+import { HttpProvider } from 'web3-core';
+
+const PRIVATE_KEY = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342';
+const PRIVATE_KEY_OTHER = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E343';
+
+function createWallet(pkey): Wallet {
+  const pkeyProvider = new PrivateKeyProvider(pkey, 'http://localhost:9933/', 42);
+  const web3 = new Web3(pkeyProvider);
+  const ethersProvider = new Web3Provider(web3.currentProvider as HttpProvider);
+  const wallet = new Wallet(PRIVATE_KEY, ethersProvider);
+  return wallet;
+}
+
+export function getWallets(): Wallet[] {
+  return [ createWallet(PRIVATE_KEY), createWallet(PRIVATE_KEY_OTHER) ];
+}
 
 const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
